@@ -61,30 +61,67 @@ export default function LiveWidget() {
 					)}
 					&nbsp;
 					{terriState !== null && (
-						<span>{terriState ? "Live" : "Offline"}</span>
+						<span
+							className={`${
+								terriState ? "text-green-900" : "text-red-900"
+							} font-extrabold`}
+						>
+							{terriState ? "Live" : "Offline"}
+						</span>
 					)}
 				</div>
 				<button
-					className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+					className="mb-1 bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
 					onClick={whoLive}
 				>
-					is terri live?
+					is terri live? 🔄
 				</button>
-				{apiResponse && (
-					<pre>{JSON.stringify(apiResponse, null, 2)}</pre>
-				)}
+				<ul>
+					{apiResponse && (
+						<pre>
+							{Object.keys(apiResponse).map((tag, i) => {
+								return (
+									<li
+										className={`${
+											apiResponse[tag]
+												? "marker:text-green-900"
+												: "marker:text-red-900"
+										} text-3xl list-disc ml-6 leading-5 hover:underline`}
+										key={i}
+									>
+										<a
+											href={
+												"https://tiktok.com/@" +
+												tag +
+												(apiResponse[tag]
+													? "/live"
+													: "")
+											}
+											target="_BLANK"
+											className="text-base"
+										>
+											@{tag}
+										</a>
+									</li>
+								);
+							})}
+						</pre>
+					)}
+				</ul>
 			</div>
 			<div>
 				<button
-					className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+					className="mt-2 bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
 					onClick={whoLive2}
 				>
-					side bitches?
+					side characters
 				</button>
 				{apiResponse2 && (
 					<pre>{JSON.stringify(apiResponse2, null, 2)}</pre>
 				)}
 			</div>
+			&nbsp;
+			<br />
 			missing user tag? raise an issue / pull request &nbsp;on
 			<a
 				href="https://github.com/MotherOfClamperl/terriverse/issues/"
