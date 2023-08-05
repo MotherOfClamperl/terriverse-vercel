@@ -1,3 +1,5 @@
+import { NextApiRequest, NextApiResponse } from "next";
+
 function tagList() {
 	return fetch(
 		"https://raw.githubusercontent.com/MotherOfClamperl/terriverse/main/list.txt"
@@ -13,7 +15,7 @@ function tagCheck(tag: string) {
 		.then((res) => res.split("SpanLiveBadge").length - 1 > 0);
 }
 
-export default function handler(req: any, res: any) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
 	// res.status(200).json({ message: "Hello from the serverless function!" });
 	tagList().then((tags: string[] | void) => {
 		if (!tags) return res.status(200).json({ err: "no tag list" });
