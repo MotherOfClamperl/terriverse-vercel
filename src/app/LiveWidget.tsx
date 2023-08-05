@@ -1,5 +1,6 @@
 "use client"; // This is a client component 👈🏽
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 type responseType = { [key: string]: boolean };
 
@@ -13,16 +14,22 @@ function alphabetizeObjectByKeys(unordered: responseType) {
 }
 
 export default function LiveWidget() {
+	const [terriState, setTerriState] = useState(null as boolean | null);
 	const [apiResponse, setApiResponse] = useState(null as responseType | null);
 	const [apiResponse2, setApiResponse2] = useState(
 		null as { coming: string } | null
 	);
 	async function whoLive() {
+		setTerriState(null);
 		setApiResponse(null);
 		try {
 			const response = await fetch("/api/who-live");
 			const data = await response.json();
 			setApiResponse(alphabetizeObjectByKeys(data.tagInfo));
+			//process data
+			let isTerriLive = false;
+			for (let i in data.tagInfo) if (data.tagInfo[i]) isTerriLive = true;
+			setTerriState(isTerriLive);
 		} catch (error) {
 			console.error("Error fetching data:", error);
 		}
@@ -38,6 +45,25 @@ export default function LiveWidget() {
 		<div>
 			<div>
 				&nbsp;
+				<div>
+					{terriState !== null && (
+						<Image
+							src={
+								terriState
+									? "https://media.discordapp.net/stickers/1049246228627603456.webp?size=60"
+									: "https://media.discordapp.net/stickers/1049244297045758082.webp?size=60"
+							}
+							width={60}
+							height={60}
+							alt={terriState ? "Live" : "Offline"}
+							className="inline-block mb-2"
+						/>
+					)}
+					&nbsp;
+					{terriState !== null && (
+						<span>{terriState ? "Live" : "Offline"}</span>
+					)}
+				</div>
 				<button
 					className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
 					onClick={whoLive}
