@@ -5,7 +5,7 @@ function tagList() {
 		"https://raw.githubusercontent.com/MotherOfClamperl/terriverse/main/list.txt"
 	)
 		.then((res) => res.text())
-		.then((txt) => txt.split("\n\n")[0].split("\n"))
+		.then((txt) => txt.split("\n\n")[1].split("\n"))
 		.catch((error) => console.warn(error));
 }
 function tagCheck(tag: string) {

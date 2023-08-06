@@ -13,11 +13,42 @@ function alphabetizeObjectByKeys(unordered: responseType) {
 		}, {});
 }
 
+function renderApiResponse(apiResponse: responseType) {
+	return (
+		<ul>
+			{Object.keys(apiResponse).map((tag, i) => {
+				return (
+					<li
+						className={`${
+							apiResponse[tag]
+								? "marker:text-green-900"
+								: "marker:text-red-900"
+						} text-3xl list-disc ml-6 leading-5 hover:underline`}
+						key={i}
+					>
+						<a
+							href={
+								"https://tiktok.com/@" +
+								tag +
+								(apiResponse[tag] ? "/live" : "")
+							}
+							target="_BLANK"
+							className="text-base"
+						>
+							@{tag}
+						</a>
+					</li>
+				);
+			})}
+		</ul>
+	);
+}
+
 export default function LiveWidget() {
 	const [terriState, setTerriState] = useState(null as boolean | null);
 	const [apiResponse, setApiResponse] = useState(null as responseType | null);
 	const [apiResponse2, setApiResponse2] = useState(
-		null as { coming: string } | null
+		null as responseType | null
 	);
 	async function whoLive() {
 		setTerriState(null);
@@ -34,8 +65,15 @@ export default function LiveWidget() {
 			console.error("Error fetching data:", error);
 		}
 	}
-	function whoLive2() {
-		setApiResponse2({ coming: "very soon!" });
+	async function whoLive2() {
+		setApiResponse2(null);
+		try {
+			const response = await fetch("/api/who-live/spinoffs");
+			const data = await response.json();
+			setApiResponse2(alphabetizeObjectByKeys(data.tagInfo));
+		} catch (error) {
+			console.error("Error fetching data:", error);
+		}
 	}
 	useEffect(() => {
 		whoLive();
@@ -76,38 +114,7 @@ export default function LiveWidget() {
 				>
 					is terri live? 🔄
 				</button>
-				<ul>
-					{apiResponse && (
-						<pre>
-							{Object.keys(apiResponse).map((tag, i) => {
-								return (
-									<li
-										className={`${
-											apiResponse[tag]
-												? "marker:text-green-900"
-												: "marker:text-red-900"
-										} text-3xl list-disc ml-6 leading-5 hover:underline`}
-										key={i}
-									>
-										<a
-											href={
-												"https://tiktok.com/@" +
-												tag +
-												(apiResponse[tag]
-													? "/live"
-													: "")
-											}
-											target="_BLANK"
-											className="text-base"
-										>
-											@{tag}
-										</a>
-									</li>
-								);
-							})}
-						</pre>
-					)}
-				</ul>
+				{apiResponse && renderApiResponse(apiResponse)}
 			</div>
 			<div>
 				<button
@@ -116,9 +123,7 @@ export default function LiveWidget() {
 				>
 					side characters
 				</button>
-				{apiResponse2 && (
-					<pre>{JSON.stringify(apiResponse2, null, 2)}</pre>
-				)}
+				{apiResponse2 && renderApiResponse(apiResponse2)}
 			</div>
 			&nbsp;
 			<br />
