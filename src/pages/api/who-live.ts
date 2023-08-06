@@ -8,11 +8,12 @@ function tagList() {
 		.then((txt) => txt.split("\n\n")[0].split("\n"))
 		.catch((error) => console.warn(error));
 }
+
+const LiveTagRegex = new RegExp("SpanLiveBadge");
 function tagCheck(tag: string) {
-	//check if user tag is live (html contains SpanLiveBadge)
 	return fetch("https://tiktok.com/@" + tag)
 		.then((res) => res.text())
-		.then((res) => res.split("SpanLiveBadge").length - 1 > 0);
+		.then((res) => LiveTagRegex.test(res));
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
