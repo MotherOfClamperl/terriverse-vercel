@@ -1,18 +1,32 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 function tagList() {
-	return fetch(
-		"https://raw.githubusercontent.com/MotherOfClamperl/terriverse/main/list.txt"
-	)
-		.then((res) => res.text())
-		.then((txt) => txt.split("\n\n")[1].split("\n"))
-		.catch((error) => console.warn(error));
+	try {
+		return fetch(
+			"https://raw.githubusercontent.com/MotherOfClamperl/terriverse/main/list.txt"
+		)
+			.then((res) => res.text())
+			.then((txt) => txt.split("\n\n")[1].split("\n"))
+			.catch((error) => console.warn(error));
+	} catch (err) {
+		console.error("Error fetching tags:", err);
+		return new Promise((resolve, reject) => {
+			resolve(["prettyaxme", "prettyaxme2"]); // at least return some main characters
+		}) as Promise<string[]>;
+	}
 }
 function tagCheck(tag: string) {
 	//check if user tag is live (html contains SpanLiveBadge)
-	return fetch("https://tiktok.com/@" + tag)
-		.then((res) => res.text())
-		.then((res) => res.split("SpanLiveBadge").length - 1 > 0);
+	try {
+		return fetch("https://tiktok.com/@" + tag)
+			.then((res) => res.text())
+			.then((res) => res.split("SpanLiveBadge").length - 1 > 0);
+	} catch (err) {
+		console.error("Error fetch checking tag: " + tag, err);
+		return new Promise((resolve, reject) => {
+			resolve(false); // don't retry, just pass false
+		}) as Promise<boolean>;
+	}
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
