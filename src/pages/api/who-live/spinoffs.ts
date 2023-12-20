@@ -3,7 +3,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 function tagList() {
 	try {
 		return fetch(
-			"https://raw.githubusercontent.com/MotherOfClamperl/terriverse/main/list.txt"
+			"https://raw.githubusercontent.com/MotherOfClamperl/terriverse/main/list.txt",
+			{ cache: "no-store" }
 		)
 			.then((res) => res.text())
 			.then((txt) => txt.split("\n\n")[1].split("\n"))
