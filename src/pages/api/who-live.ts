@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import {Browser, firefox} from "@playwright/test";
 
 function tagList() {
 	try {
@@ -16,41 +17,50 @@ function tagList() {
 	}
 }
 
-const LiveTagRegex = new RegExp("SpanLiveBadge");
-function tagCheck(tag: string) {
-	try {
-		return fetch("https://tiktok.com/@" + tag)
-			.then((res) => res.text())
-			.then((res) => LiveTagRegex.test(res));
-	} catch (err) {
-		console.error("Error fetch checking tag: " + tag, err);
-		return new Promise((resolve, reject) => {
-			resolve(false); // don't retry, just pass false
-		}) as Promise<boolean>;
-	}
-}
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
 	tagList().then((tags: string[] | void) => {
 		if (!tags) return res.status(200).json({ err: "no tag list" });
+		async function tagCheck(tag: string) {
+			const page = await browser.newPage();
+			try {
+				await page.goto("https://tiktok.com/@" + tag);
+			} catch(e) {
+				return false;
+			}
+			const links = await page.getByRole("link").all();
+			console.log(`lennn ${links.length}`);
+			for (let link of links)
+				if ((await link.getAttribute("target")) === "tiktok_live_view_window")
+					return true;
+			return false;
+		}
 		// tags.push("XXX"); // test: uncomment line, replace XXX with tag of currently live user (it will be the sole "true" response)
-		function finishResponse() {
-			res.status(200).json({
-				tagInfo,
-			});
-		}
-		const tagInfo: { [key: string]: boolean } = {};
-		let tagCount = tags.length;
-		for (let i in tags) {
-			const tag = tags[i];
-			if (!tag) {
-				tagCount--;
-				continue;
-			} //ignore blank lines
-			tagCheck(tag).then((res) => {
-				tagInfo[tag] = res;
-				if (Object.keys(tagInfo).length === tagCount) finishResponse();
-			});
-		}
+		let browser: Browser;
+		firefox.launch().then((_browser: Browser) => {
+			browser = _browser;
+			const tagInfo: { [key: string]: boolean } = {};
+			let tagCount = tags.length;
+			for (let i in tags) {
+				const tag = tags[i];
+				if (!tag) {
+					tagCount--;
+					continue;
+				} //ignore blank lines
+				tagCheck(tag)
+					.then((res) => {
+						tagInfo[tag] = res;
+						console.log(`${Object.keys(tagInfo).length}===${tagCount}`);
+						if (Object.keys(tagInfo).length === tagCount) console.log(tagInfo);
+						if (Object.keys(tagInfo).length === tagCount) finishResponse().then((res) => {});
+					})
+			}
+			async function finishResponse() {
+				res.status(200).json({
+					tagInfo,
+				});
+				await browser.close();
+			}
+		});
 	});
 }
