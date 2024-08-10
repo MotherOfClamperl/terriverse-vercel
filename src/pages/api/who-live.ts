@@ -38,6 +38,7 @@ function afterBrowserLaunched() {
 			const terriTags = terriAndSpinoffTags[0].split("\n");
 			const spinoffTags = terriAndSpinoffTags[1].split("\n");
 			if (spinoffTags[spinoffTags.length - 1] === "") spinoffTags.pop();
+
 			const startingTerriStates = new Array(terriTags.length).fill(false); //just assume everyone is offline until we can process the tag
 			const startingSpinoffStates = new Array(spinoffTags.length).fill(
 				false,
@@ -69,17 +70,20 @@ async function tagCheck(tag: string) {
 	return false;
 }
 async function startProcessingTags() {
-	function process() {
+	function process(globalKey: string) {
 		return async function () {
 			//@ts-ignore
-			for (const tag in global.terriTags) //@ts-ignore
-				global.terriTags[tag] = await tagCheck(tag);
+			for (const tag in global[globalKey]) {
+				//@ts-ignore
+				global[globalKey][tag] = await tagCheck(tag); //@ts-ignore
+				console.log(`@${tag} = ${global[globalKey][tag]}`);
+			}
 		};
 	}
 	//@ts-ignore
-	const processTeri = process(global.terriTags);
+	const processTeri = process("terriTags");
 	//@ts-ignore
-	const processSpinoffs = process(global.spinoffTags);
+	const processSpinoffs = process("spinoffTags");
 	setInterval(processTeri, TERRI_REFRESH_MINUTES * 1000 * 60);
 	setInterval(processSpinoffs, SPINOFFS_REFRESH_MINUTES * 1000 * 60);
 	processTeri();
