@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Browser, firefox } from "@playwright/test";
+import { Browser, chromium } from "@playwright/test";
 
 const TERRI_REFRESH_MINUTES = 3,
 	SPINOFFS_REFRESH_MINUTES = 10;
@@ -8,7 +8,7 @@ const TERRI_REFRESH_MINUTES = 3,
 if (!global.terriTags) global.terriTags = { _itzpsyiconic_: false }; //@ts-ignore
 if (!global.spinoffTags) global.spinoffTags = {}; //@ts-ignore
 if (!global.browser)
-	firefox.launch().then((browser: Browser) => {
+	chromium.launch().then((browser: Browser) => {
 		//@ts-ignore
 		global.browser = browser;
 		afterBrowserLaunched();
