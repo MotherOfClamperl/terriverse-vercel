@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npx playwright install --with-deps chromium",
+    "build": "next build && npx playwright install-deps",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npx playwright install --with-deps chromium"
+    "postinstall": "npx playwright install-deps"
   },
   "dependencies": {
     "@types/node": "20.4.7",
