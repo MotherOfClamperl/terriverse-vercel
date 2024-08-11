@@ -7,7 +7,7 @@
     "build": "next build && npx playwright install --with-deps firefox",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npx playwright install"
+    "postinstall": "npx playwright install --with-deps firefox"
   },
   "dependencies": {
     "@types/node": "20.4.7",
